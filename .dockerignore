@@ -1,0 +1,30 @@
+# Git
+.git
+.gitignore
+
+# Node modules (if any)
+node_modules
+npm-debug.log*
+
+# Build artifacts
+*.log
+dist/
+build/
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker files
+Dockerfile*
+.dockerignore
+
+# Documentation that doesn't need to be in container
+*.md
+docs/
