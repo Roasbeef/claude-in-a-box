@@ -25,8 +25,16 @@ services:
       - no-new-privileges:true
     read_only: false  # Need write access for git operations
     tmpfs:
-      - /tmp:noexec,nosuid,nodev
+      - /tmp:noexec,nosuid,nodev,size=100m
+      - /var/tmp:noexec,nosuid,nodev,size=50m
     cap_drop:
       - ALL
     cap_add:
       - DAC_OVERRIDE  # Needed for file operations
+    # Resource limits
+    mem_limit: 1g
+    memswap_limit: 1g
+    cpu_quota: 100000  # 1 CPU core
+    pids_limit: 100
+    # Network isolation
+    network_mode: none  # No network access by default

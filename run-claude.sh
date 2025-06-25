@@ -56,7 +56,14 @@ echo "  - Git commits will be reflected on your host machine"
 echo "  - Type 'exit' to leave the container"
 echo ""
 
-# Start the container interactively
-docker-compose run --rm claude-sandbox bash
+# Check if network access is needed (for Claude API calls)
+if [[ "$1" == "--network" ]]; then
+    echo -e "${YELLOW}🌐 Starting with network access enabled${NC}"
+    docker-compose -f docker-compose.yml -f docker-compose.override.yml run --rm claude-sandbox bash
+else
+    echo -e "${YELLOW}🔒 Starting in network-isolated mode (use --network flag to enable network)${NC}"
+    # Start the container interactively
+    docker-compose run --rm claude-sandbox bash
+fi
 
 echo -e "${GREEN}✅ Claude sandbox session ended${NC}"

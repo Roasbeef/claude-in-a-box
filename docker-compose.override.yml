@@ -1,0 +1,13 @@
+# Override file for development/network access scenarios
+# Use with: docker-compose -f docker-compose.yml -f docker-compose.override.yml up
+
+version: '3.8'
+
+services:
+  claude-sandbox:
+    # Enable network access for Claude API calls or git operations over HTTPS
+    network_mode: bridge
+    # Optionally increase resource limits for intensive tasks
+    mem_limit: 2g
+    memswap_limit: 2g
+    cpu_quota: 200000  # 2 CPU cores
