@@ -87,14 +87,13 @@ claude-box() {
         --security-opt no-new-privileges:true \
         --cap-drop ALL \
         --cap-add DAC_OVERRIDE \
-        --network none \
         --tmpfs /tmp:noexec,nosuid,nodev,size=100m \
         --tmpfs /var/tmp:noexec,nosuid,nodev,size=50m \
         --memory=1g \
         --memory-swap=1g \
         --cpu-quota=100000 \
         --pids-limit=100 \
-        roasbeef/claude-in-a-box bash
+        roasbeef/claude-in-a-box claude
 }
 ```
 
