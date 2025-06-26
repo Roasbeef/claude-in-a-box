@@ -44,10 +44,11 @@ else
     TEMP_DIR=$(mktemp -d)
     trap "rm -rf $TEMP_DIR" EXIT
     
-    cd "$TEMP_DIR"
+    pushd "$TEMP_DIR" > /dev/null
     git clone https://github.com/roasbeef/claude-in-a-box.git
     cd claude-in-a-box
     docker build -t roasbeef/claude-in-a-box:latest .
+    popd > /dev/null
     echo -e "${GREEN}✅ Docker image built successfully${NC}"
 fi
 
