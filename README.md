@@ -32,6 +32,79 @@ The system creates a secure Docker container that:
 - Runs Claude CLI as a non-root user with minimal privileges
 - Enables Claude to make commits that appear in your local git history
 
+## One-Line Setup (Easiest)
+
+Install and run from any git repository with a single command:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/roasbeef/claude-in-a-box/main/install.sh | bash
+```
+
+This will:
+1. Pull the pre-built Docker image
+2. Install the `claude-box` function in your shell
+3. Let you run `claude-box` from any git repository
+
+## Global Usage (Manual Setup)
+
+For easier access from any git repository, add this function to your `~/.bashrc` or `~/.zshrc`:
+
+```bash
+claude-box() {
+    # Validate git config
+    if ! git config user.name > /dev/null 2>&1; then
+        echo "❌ No git user.name configured. Please run: git config --global user.name 'Your Name'"
+        return 1
+    fi
+    
+    if ! git config user.email > /dev/null 2>&1; then
+        echo "❌ No git user.email configured. Please run: git config --global user.email 'your@email.com'"
+        return 1
+    fi
+    
+    # Check if Docker is running
+    if ! docker info > /dev/null 2>&1; then
+        echo "❌ Docker is not running. Please start Docker first."
+        return 1
+    fi
+    
+    # Set git environment variables
+    export GIT_AUTHOR_NAME="$(git config user.name)"
+    export GIT_AUTHOR_EMAIL="$(git config user.email)"
+    export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
+    export GIT_COMMITTER_EMAIL="$GIT_COMMITTER_EMAIL"
+    
+    # Run Claude container with full security hardening
+    docker run --rm -it \
+        -v "$(pwd)":/workspace \
+        -v ~/.gitconfig:/home/claude/.gitconfig:ro \
+        -v ~/.ssh:/home/claude/.ssh:ro \
+        -w /workspace \
+        -e GIT_AUTHOR_NAME \
+        -e GIT_AUTHOR_EMAIL \
+        -e GIT_COMMITTER_NAME \
+        -e GIT_COMMITTER_EMAIL \
+        --security-opt no-new-privileges:true \
+        --cap-drop ALL \
+        --cap-add DAC_OVERRIDE \
+        --network none \
+        --tmpfs /tmp:noexec,nosuid,nodev,size=100m \
+        --tmpfs /var/tmp:noexec,nosuid,nodev,size=50m \
+        --memory=1g \
+        --memory-swap=1g \
+        --cpu-quota=100000 \
+        --pids-limit=100 \
+        roasbeef/claude-in-a-box bash
+}
+```
+
+Then reload your shell:
+```bash
+source ~/.bashrc  # or ~/.zshrc
+```
+
+Now you can run `claude-box` from any git repository!
+
 ## Configuration
 
 ### Git Integration
@@ -51,4 +124,6 @@ The system creates a secure Docker container that:
 - `Dockerfile` - Container definition with Claude CLI and security hardening
 - `docker-compose.yml` - Service configuration with volume mounts and security settings
 - `run-claude.sh` - Convenience script for container management
+- `install.sh` - One-line installer for global setup
+- `publish.sh` - Script to build and publish Docker image to Docker Hub
 - `.dockerignore` - Optimized build context exclusions
