@@ -105,12 +105,18 @@ claude-box() {
     export GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
     export GIT_COMMITTER_EMAIL="$GIT_COMMITTER_EMAIL"
     
+    # Find git root directory and project name
+    GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "$(pwd)")
+    PROJECT_NAME=$(basename "$GIT_ROOT")
+    
     # Run Claude container with full security hardening
     docker run --rm -it \
-        -v "$(pwd)":/workspace \
+        -v "$GIT_ROOT":/home/claude/"$PROJECT_NAME" \
         -v ~/.gitconfig:/home/claude/.gitconfig:ro \
         -v ~/.ssh:/home/claude/.ssh:ro \
-        -w /workspace \
+        -v ~/.claude:/home/claude/.claude \
+        -v ~/.claude.json:/home/claude/.claude.json \
+        -w /home/claude/"$PROJECT_NAME" \
         -e GIT_AUTHOR_NAME \
         -e GIT_AUTHOR_EMAIL \
         -e GIT_COMMITTER_NAME \
